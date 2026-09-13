@@ -1,0 +1,11 @@
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install flask
+python -m pip install flask-sqlalchemy
+python -m pip install fastapi pydantic uvicorn
+pip install fastapi uvicorn
+uvicorn foldername:app --reload -> to run the server
+
+
+
+# Query , Path , Header
