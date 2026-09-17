@@ -1,9 +1,14 @@
 from fastapi import FastAPI, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import create_engine, Column, Integer, String, Nullable
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
 from typing import Optional, List
+from passlib.context import CryptContext
+import jwt
+from datetime import  timedelta
+
 
 # Dependency-> Dependency injection
 # create_engine -> connection to specific thing to database
@@ -113,3 +118,4 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(db_user)
     db.commit()
     return {"message": "User deleted", "user": db_user}
+
