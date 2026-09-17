@@ -9,6 +9,9 @@ uvicorn foldername:app --reload -> to run the server
 db.query(User).all()      # Read
 db.add(new_user)          # Write
 db.commit()               # Save changes
+db.delete(user)           # DELETE
 db.close()                # Return the car (close connection)
 
 # Query , Path , Header
+
+python -m uvicorn myapi2:app --reload
