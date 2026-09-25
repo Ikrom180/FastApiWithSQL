@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from sqlalchemy import create_engine, Column, Integer, String, Nullable
+from sqlalchemy import create_engine, Column, Integer, String, Nullable, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from pydantic import BaseModel
@@ -14,11 +14,41 @@ from datetime import  timedelta
 # create_engine -> connection to specific thing to database
 # declarative_base create base class database model
 
+#Security Config
+
+SECRET_KEY = "codeikrom"
+ALGORITHM = "HS256"
+TOKEN_EXPIRATION = 30
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app = FastAPI(title="FastApi with DataBase")
 
 
+
 engine = create_engine("sqlite:///data.db", connect_args={"check_same_thread": False})
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -28,32 +58,46 @@ class User(Base): #Base DB
     username = Column(String , nullable=False)
     email = Column(String , nullable=False)
     role = Column(String, nullable=True)
+    # hashed_pwd = Column(String, nullable=False)
+    # is_active = Column(Boolean, default=True)
 
 Base.metadata.create_all(engine)
 
 #Pydantic Models
-
+#API models
 class UserCreate(BaseModel):
     username: str
     email: str
     role: str
+    # password: str
 
 class UserResponse(BaseModel):
     id:int
     username: str
     email: str
     role: str
+    # is_active: bool
 
     class Config:
         from_attributes = True
 
 
-class UpdateUserResponse(BaseModel):
-    message: str
-    user: UserResponse
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
-    class Config:
-        from_attributes = True   # Pydantic v2 (use orm_mode=True in v1)
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    email: Optional[str] = None
+
+
+
+
+
+
 
 def get_db():
     db = SessionLocal()
@@ -93,7 +137,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 #user update
-@app.put("/users/{user_id}", tags=["Users"], response_model=UpdateUserResponse)
+@app.put("/users/{user_id}", tags=["Users"], response_model=UserResponse)
 def update_user(user_id: int, user: UserCreate, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
@@ -118,4 +162,8 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(db_user)
     db.commit()
     return {"message": "User deleted", "user": db_user}
+
+@app.get("/users/", response_model=List[UserResponse], tags=["Users"])
+def get_all_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
 
