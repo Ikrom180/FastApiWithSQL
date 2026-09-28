@@ -26,23 +26,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 app = FastAPI(title="FastApi with DataBase")
 
 
@@ -58,8 +41,8 @@ class User(Base): #Base DB
     username = Column(String , nullable=False)
     email = Column(String , nullable=False)
     role = Column(String, nullable=True)
-    # hashed_pwd = Column(String, nullable=False)
-    # is_active = Column(Boolean, default=True)
+    hashed_pwd = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
 
 Base.metadata.create_all(engine)
 
@@ -69,14 +52,14 @@ class UserCreate(BaseModel):
     username: str
     email: str
     role: str
-    # password: str
+    password: str
 
 class UserResponse(BaseModel):
     id:int
     username: str
     email: str
     role: str
-    # is_active: bool
+    is_active: bool
 
     class Config:
         from_attributes = True
@@ -93,6 +76,10 @@ class Token(BaseModel):
 class TokenData(BaseModel):
     email: Optional[str] = None
 
+
+#Security Functions
+def verify_pwd(plain_pwd: str, hashed_pwd: str) -> bool:
+    return pwd_context.verify(plain_pwd, hashed_pwd)
 
 
 
