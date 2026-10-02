@@ -7,8 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 from passlib.context import CryptContext
 import jwt
-from datetime import  timedelta
-
+from datetime import timedelta, datetime
 
 # Dependency-> Dependency injection
 # create_engine -> connection to specific thing to database
@@ -43,6 +42,7 @@ class User(Base): #Base DB
     role = Column(String, nullable=True)
     hashed_pwd = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+
 
 Base.metadata.create_all(engine)
 
@@ -81,6 +81,24 @@ class TokenData(BaseModel):
 def verify_pwd(plain_pwd: str, hashed_pwd: str) -> bool:
     return pwd_context.verify(plain_pwd, hashed_pwd)
 
+
+def get_pwd_hash(password:str) -> str:
+     return pwd_context.hash(password)
+
+
+def create_access_token(data:dict, expires_delta:Optional[timedelta]= None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_token(data:dict, expires_delta: Optional[timedelta]=None) -> str:
+    pass
 
 
 

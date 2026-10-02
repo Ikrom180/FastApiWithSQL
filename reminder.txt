@@ -15,3 +15,7 @@ db.close()                # Return the car (close connection)
 # Query , Path , Header
 
 python -m uvicorn myapi2:app --reload
+
+
+Postgress
+python -m pip install psycopg2
