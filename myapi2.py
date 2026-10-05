@@ -333,3 +333,7 @@ def delete_user(
 def get_all_users(db: Session = Depends(get_db)):
     return db.query(User).all()
 
+@app.get("/me")
+async def read_me(token: str = Depends(oauth2_scheme)):
+    print(token)          # 👈 this prints the actual token string
+    return {"token": token}
