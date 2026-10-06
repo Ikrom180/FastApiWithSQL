@@ -116,7 +116,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-def verify_token(token: str) -> TokenData:
+def verify_token(token: str) -> TokenData: # this code check the token and get the inside dictionary sub: key
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
@@ -138,7 +138,7 @@ def verify_token(token: str) -> TokenData:
 # ============================================================
 # PART 7 — Dependency Injection Helpers
 # ============================================================
-def get_db():
+def get_db():  # This will use db
     db = SessionLocal()
     try:
         yield db
@@ -146,7 +146,7 @@ def get_db():
         db.close()
 
 
-def get_current_user(
+def get_current_user(    #-> this will check the user with email
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ):
