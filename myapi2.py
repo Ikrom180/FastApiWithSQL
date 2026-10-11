@@ -116,7 +116,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-def verify_token(token: str) -> TokenData: # this code check the token and get the inside dictionary sub: key
+def verify_token(token: str) -> TokenData: # this code check the token and get the inside dictionary sub: key and decode
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
@@ -147,10 +147,10 @@ def get_db():  # This will use db
 
 
 def get_current_user(    #-> this will check the user with email
-    token: str = Depends(oauth2_scheme),
+    token: str = Depends(oauth2_scheme), #->  oauth2_scheme will require token
     db: Session = Depends(get_db)
 ):
-    token_data = verify_token(token)
+    token_data = verify_token(token) # decoding code right there
     user = db.query(User).filter(User.email == token_data.email).first()
     if user is None:
         raise HTTPException(
